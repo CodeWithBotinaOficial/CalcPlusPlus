@@ -1,0 +1,141 @@
+# ======================================================
+# CalcPlusPlus - Git Ignore File
+# Project type: C++ / Qt6 / CMake / CLion (Linux)
+# ======================================================
+
+# ------------------------------------------------------
+# Build directories
+# ------------------------------------------------------
+# Ignore all build directories commonly created by CMake or CLion.
+# These contain compiled binaries and temporary build artifacts.
+cmake-build-debug/
+cmake-build-release/
+build/
+out/
+bin/
+obj/
+lib/
+
+# ------------------------------------------------------
+# CMake generated files
+# ------------------------------------------------------
+# These files are automatically created when configuring CMake.
+# Never commit them to version control.
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Testing/
+CTestTestfile.cmake
+install_manifest.txt
+compile_commands.json
+cmake_install.cmake
+Makefile
+build.ninja
+.ninja_deps
+.ninja_log
+
+# ------------------------------------------------------
+# CLion and JetBrains IDEs
+# ------------------------------------------------------
+# User-specific configuration, caches, and indexing data.
+.idea/
+*.iml
+.clion/
+
+# ------------------------------------------------------
+# Qt-specific generated files
+# ------------------------------------------------------
+# Qt's Meta-Object Compiler (MOC), UI Compiler (UIC), and Resource Compiler (RCC)
+# generate intermediate files that should not be versioned.
+*.moc
+*_autogen/
+*.qrc.dep
+*.qmlc
+*.jsc
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+
+# ------------------------------------------------------
+# Compiled binary files
+# ------------------------------------------------------
+# Ignore executable and binary output files.
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+*.o
+*.obj
+*.out
+*.app
+*.elf
+
+# ------------------------------------------------------
+# Logs and temporary files
+# ------------------------------------------------------
+# Ignore all system or debugging logs and temporary editor files.
+*.log
+*.tmp
+*.swp
+*.swo
+*.DS_Store
+Thumbs.db
+*.bak
+*.old
+*.orig
+*~
+
+# ------------------------------------------------------
+# Coverage and testing
+# ------------------------------------------------------
+# Ignore coverage reports and testing artifacts.
+*.gcno
+*.gcda
+*.gcov
+coverage/
+lcov-report/
+
+# ------------------------------------------------------
+# Python virtual environments (if using scripts)
+# ------------------------------------------------------
+venv/
+.env/
+__pycache__/
+*.pyc
+
+# ------------------------------------------------------
+# System specific ignores
+# ------------------------------------------------------
+# Linux / macOS / Windows junk files.
+.cache/
+.trash/
+ehthumbs.db
+desktop.ini
+
+# ------------------------------------------------------
+# User configuration files
+# ------------------------------------------------------
+# Any local config or environment-specific settings.
+*.pro.user
+*.user
+*.user.*
+*.config
+*.local
+*.settings
+*.env
+
+# ------------------------------------------------------
+# Backup files and notes
+# ------------------------------------------------------
+# Developer’s personal scratch files and notes.
+notes.txt
+todo.txt
+*.bak
+*.draft
+*.tmp
+
+# ======================================================
+# END OF FILE
+# ======================================================
