@@ -1,11 +1,13 @@
-name: Build and Publish CalcPlusPlus
+name: Build and Release CalcPlusPlus
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - 'v*'
 
 jobs:
-  build-deb:
+  build-and-release:
+    name: Build and Upload .deb to GitHub Release
     runs-on: ubuntu-latest
 
     permissions:
@@ -13,60 +15,30 @@ jobs:
       packages: write
 
     steps:
-      # 1️⃣ Checkout source code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Install dependencies
-      - name: Install Qt6 and build tools
-        run: |
-          sudo apt update
-          sudo apt install -y cmake ninja-build qt6-base-dev qt6-base-dev-tools libqt6sql6-sqlite
+      - name: Set up Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: 6.6.3
 
-      # 3️⃣ Build & package
-      - name: Build CalcPlusPlus and create .deb
+      - name: Build project
         run: |
           cmake -B build -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --target all
-          cd build
-          cpack --config CPackConfig.cmake
-          cd ..
+          cmake --build build --config Release
 
-      # 4️⃣ Upload .deb to GitHub Release
-      # ✅ FIXED: Use PAT (must have “repo” scope)
+      - name: Package .deb
+        run: |
+          cpack -G DEB -B build
+
       - name: Upload .deb to GitHub Release
         uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT_FOR_RELEASES }}
         with:
           files: build/*.deb
-          tag_name: ${{ github.event.release.tag_name }}
+          token: ${{ secrets.GH_PAT_FOR_RELEASES }}
           overwrite: true
-          fail_on_unmatched_files: true
-
-      # 5️⃣ Publish .deb to GitHub Packages
-      - name: Publish .deb to GitHub Packages
-        run: |
-          DEB_FILE=$(find build -name "*.deb" | head -n 1)
-          if [ -z "$DEB_FILE" ]; then
-            echo "❌ Error: .deb not found."
-            exit 1
-          fi
-
-          PACKAGE_NAME="calcplusplus"
-          VERSION=$(basename "$DEB_FILE" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
-
-          echo "Uploading $DEB_FILE as version $VERSION..."
-
-          curl -X POST \
-            -H "Authorization: Bearer ${{ secrets.GH_PAT_FOR_RELEASES }}" \
-            -H "Content-Type: application/octet-stream" \
-            --data-binary @"$DEB_FILE" \
-            "https://uploads.github.com/repos/${{ github.repository }}/releases/${{ github.event.release.id }}/assets?name=$(basename "$DEB_FILE")"
-
-      # 6️⃣ Upload as artifact for inspection (optional)
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: calcplusplus-deb
-          path: build/*.deb
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT_FOR_RELEASES }}
