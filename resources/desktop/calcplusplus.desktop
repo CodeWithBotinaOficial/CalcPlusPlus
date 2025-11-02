@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=CalcPlusPlus
+Comment=Modern and elegant calculator built with Qt6
+Exec=CalcPlusPlus
+Icon=calcplusplus
+Terminal=false
+Type=Application
+Categories=Utility;Calculator;

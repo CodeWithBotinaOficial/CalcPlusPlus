@@ -44,64 +44,51 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE Qt6::Widgets Qt6::Core Qt6::Gui Qt6::Sql
 )
 
-# --- Installation Configuration ---
-
-# 1. Install the compiled binary
-install(TARGETS ${PROJECT_NAME} DESTINATION /usr/local/bin)
-
-# 2. Create and install the .desktop launcher file
-set(CALCPLUSPLUS_DESKTOP_CONTENT "
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=CalcPlusPlus
-Comment=Modern calculator app built with Qt6
-Exec=CalcPlusPlus
-Icon=calcplusplus
-Terminal=false
-Categories=Utility;Calculator;
-StartupNotify=true
-")
-
-# Write the .desktop file to the build directory
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/calcplusplus.desktop" "${CALCPLUSPLUS_DESKTOP_CONTENT}")
-
-# Install the .desktop file
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/calcplusplus.desktop"
-    DESTINATION share/applications
-)
-
-# 3. Install the application icon
-# IMPORTANT: Ensure a valid 256x256 PNG icon named 'calcplusplus.png' exists in resources/icons/
-file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/resources/icons") # Ensure directory exists
-install(FILES "${CMAKE_SOURCE_DIR}/resources/icons/calcplusplus.png"
-    DESTINATION share/icons/hicolor/256x256/apps
-)
-
-# --- CPack Configuration for Debian Package ---
+# --- Packaging Configuration for CPack (.deb) ---
 
 include(InstallRequiredSystemLibraries)
-set(CPACK_GENERATOR "DEB")
+
+set(CPACK_PROJECT_NAME "${PROJECT_NAME}") # Explicitly set CPack project name
 set(CPACK_PACKAGE_NAME "calcplusplus")
+set(CPACK_PACKAGE_VENDOR "CodeWithBotina")
+set(CPACK_PACKAGE_CONTACT "code.with.botina@gmail.com")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "CalcPlusPlus — A modern and elegant Qt6-based calculator for Linux.")
 set(CPACK_PACKAGE_VERSION "1.0.0")
-set(CPACK_PACKAGE_CONTACT "Diego Alejandro Botina <code.with.botina@gmail.com>")
-set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Diego Alejandro Botina")
+set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/CodeWithBotinaOficial/CalcPlusPlus")
+set(CPACK_PACKAGE_MAINTAINER "Diego Alejandro Botina (CodeWithBotina)")
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_amd64")
 set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
 set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6widgets6, libqt6gui6, libqt6core6, libqt6sql6, libsqlite3-0")
 set(CPACK_DEBIAN_ARCHITECTURE "amd64")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Modern calculator built with Qt6 and C++")
+
+# --- Installation Rules ---
+# Install the compiled binary to /usr/bin
+install(TARGETS ${PROJECT_NAME} DESTINATION bin)
+
+# Create the resources/icons directory if it doesn't exist
+file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/resources/icons")
+# Install the application icon to /usr/share/icons/hicolor/256x256/apps (Corrected path)
+install(FILES "${CMAKE_SOURCE_DIR}/resources/icons/calcplusplus.png" DESTINATION share/icons/hicolor/256x256/apps)
+
+# Create the resources/desktop directory if it doesn't exist
+file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/resources/desktop")
+# Install the .desktop launcher file to /usr/share/applications
+install(FILES "${CMAKE_SOURCE_DIR}/resources/desktop/calcplusplus.desktop" DESTINATION share/applications)
+
+# Install LICENSE and README.md
+install(FILES "${CMAKE_SOURCE_DIR}/LICENSE" DESTINATION share/doc/${CPACK_PACKAGE_NAME})
+install(FILES "${CMAKE_SOURCE_DIR}/README.md" DESTINATION share/doc/${CPACK_PACKAGE_NAME})
+
+# --- CPack Configuration for Debian Package ---
+# Set the CPack generator to DEB
+set(CPACK_GENERATOR "DEB")
 
 # Point CPack to the custom debian/control file
 set(CPACK_DEBIAN_PACKAGE_CONTROL_FILE "${CMAKE_SOURCE_DIR}/debian/control")
 
 # Include postinst and prerm scripts
 set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/debian/postinst;${CMAKE_SOURCE_DIR}/debian/prerm")
-
-# Define the base name for the package file (e.g., calcplusplus_1.0.0_amd64)
-set(CPACK_PACKAGE_FILE_NAME "calcplusplus_${CPACK_PACKAGE_VERSION}_${CPACK_DEBIAN_ARCHITECTURE}")
-
-# Explicitly set the full path and name for the DEB package output
-set(CPACK_OUTPUT_FILE_NAMES "${CMAKE_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}.deb")
 
 # Include CPack last
 include(CPack)
