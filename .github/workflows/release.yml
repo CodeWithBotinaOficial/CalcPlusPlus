@@ -1,34 +1,103 @@
+# Workflow to build the CalcPlusPlus application, generate a Debian package,
+# upload it to GitHub Releases, and publish it to GitHub Packages.
 name: Build and Publish CalcPlusPlus
 
+# Controls when the workflow will run.
 on:
+  # Trigger the workflow when a new release is published.
   release:
     types: [published]
 
+# A workflow run is made up of one or more jobs.
 jobs:
   build-deb:
+    # The type of runner that the job will run on.
     runs-on: ubuntu-latest
+
+    # Define permissions for the GITHUB_TOKEN or PAT used in this job.
+    # 'contents: write' is needed to upload release assets.
+    # 'packages: write' is needed to publish to GitHub Packages.
+    # These permissions apply to the default GITHUB_TOKEN, but are good practice
+    # to declare even when using a custom PAT for clarity and potential future changes.
     permissions:
-      contents: write # <--- This grants write permission for the default GITHUB_TOKEN
+      contents: write
+      packages: write
+
+    # Steps represent a sequence of tasks that will be executed as part of the job.
     steps:
+      # Step 1: Checkout the repository code.
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Step 2: Install build dependencies for Qt6, CMake, Ninja, and SQLite.
       - name: Install dependencies
         run: |
           sudo apt update
           sudo apt install -y cmake ninja-build qt6-base-dev qt6-base-dev-tools libqt6sql6-sqlite
 
-      - name: Build CalcPlusPlus
+      # Step 3: Build the CalcPlusPlus application and generate the .deb package.
+      - name: Build CalcPlusPlus and Generate .deb
         run: |
+          # Configure CMake for a Release build.
           cmake -B build -DCMAKE_BUILD_TYPE=Release
+          # Build the project.
           cmake --build build --target all
-          cd build # Change directory to build
-          cpack --config CPackConfig.cmake # Run cpack from build directory
+          # Change directory to 'build' before running cpack to ensure the .deb is generated there.
+          cd build
+          # Run cpack to create the Debian package.
+          cpack --config CPackConfig.cmake
+          # Go back to the project root for subsequent steps.
+          cd ..
 
+      # Step 4: Upload the generated .deb package to the GitHub Release.
+      # This action automatically detects the release triggered by 'on: release'.
       - name: Upload .deb to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          # Specify the file pattern for assets to upload. It's relative to GITHUB_WORKSPACE.
           files: build/*.deb
-          overwrite_files: true # <--- ADDED THIS LINE
+          # Crucial: Overwrite existing assets if they have the same name.
+          # This helps with re-runs or updates to a release.
+          overwrite_files: true
+          # Use the custom PAT for authentication. This PAT needs 'repo' scope.
+          # It should be stored as a repository secret named GH_PAT_FOR_RELEASES.
+          token: ${{ secrets.GH_PAT_FOR_RELEASES }}
+
+      # Step 5: Publish the generated .deb package to GitHub Packages (Generic Packages).
+      # This uses curl to interact with the GitHub Packages API.
+      - name: Publish .deb to GitHub Packages
+        run: |
+          # Find the generated .deb file in the build directory.
+          DEB_FILE=$(find build -name "calcplusplus_*.deb" | head -n 1)
+          if [ -z "$DEB_FILE" ]; then
+            echo "Error: .deb file not found in build/ directory." >&2
+            exit 1
+          fi
+
+          # Extract package name and version from the .deb filename for GitHub Packages.
+          # Example: calcplusplus_1.0.0_amd64.deb -> package_name=calcplusplus, package_version=1.0.0
+          PACKAGE_NAME=$(echo "$DEB_FILE" | sed -E 's|build/(.*)_[0-9]+\.[0-9]+\.[0-9]+_amd64\.deb|\1|')
+          PACKAGE_VERSION=$(echo "$DEB_FILE" | sed -E 's|build/.*_([0-9]+\.[0-9]+\.[0-9]+)_amd64\.deb|\1|')
+
+          echo "Publishing $DEB_FILE to GitHub Packages..."
+          echo "Package Name: $PACKAGE_NAME"
+          echo "Package Version: $PACKAGE_VERSION"
+
+          # Use curl to upload the .deb file to GitHub Packages (Generic Packages).
+          # The URL format is: https://api.github.com/repos/OWNER/REPO/packages/generic/PACKAGE_NAME/versions
+          # Authentication is done via the PAT. This PAT needs 'write:packages' scope.
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.GH_PAT_FOR_RELEASES }}" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary "@$DEB_FILE" \
+            "https://api.github.com/repos/${{ github.repository }}/packages/generic/${PACKAGE_NAME}/versions"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Ensure the PAT is available for the curl command.
+          GH_PAT: ${{ secrets.GH_PAT_FOR_RELEASES }}
+
+      # Optional: Upload build artifacts for debugging or later use.
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: calcplusplus-deb
+          path: build/*.deb
