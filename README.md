@@ -1,160 +1,129 @@
-# 🧮 CalcPlusPlus
+# CalcPlusPlus - A Modern Qt6 C++ Scientific Calculator
 
-**CalcPlusPlus** is a modern, professional-grade calculator application built in **C++** with a **Qt6 GUI** and **SQLite** support for persistent history tracking.  
-Developed by [Diego Alejandro Botina (CodeWithBotina)](https://github.com/CodeWithBotinaOficial), this project aims to demonstrate clean architecture, strong error handling, and elegant UI design — making it a perfect addition to any software development portfolio.
-
----
-
-## 🚀 Features
-
-✅ **Basic Operations** — Addition, subtraction, multiplication, division, percentage, power, and square root.  
-🧠 **Smart History** — Every equation is saved to an **SQLite** database with navigable history.  
-🎨 **Responsive GUI** — Built with **Qt6**, the interface dynamically adjusts to different window sizes.  
-⚙️ **Error Handling** — Robust validation for invalid inputs, divide-by-zero, and malformed expressions.  
-🧩 **Design Patterns** — Clean and modular architecture following OOP and MVC principles.  
-💾 **Precision** — Full floating-point and decimal handling with rounding control.  
-🔥 **Cross-Platform Ready** — Built and tested on Ubuntu 22.04; distributed as a `.deb` package.  
-
----
-
-## 🏗️ Tech Stack
-
-| Component | Technology Used |
-|------------|-----------------|
-| **Language** | C++17 |
-| **GUI Framework** | Qt 6.x |
-| **Database** | SQLite3 |
-| **Build System** | CMake + GNU Make |
-| **Compiler** | g++ 13.1.0 |
-| **IDE** | CLion 2025.2.4 |
-| **OS Compatibility** | Ubuntu 22.04+ (.deb package release) |
+## Table of Contents
+- [Overview](#overview)
+- [Features](#features)
+  - [Core Functionality](#core-functionality)
+  - [Expression Display](#expression-display)
+  - [Interactive History](#interactive-history)
+  - [Error Handling](#error-handling)
+  - [Design & User Interface](#design--user-interface)
+- [Installation Guide](#installation-guide)
+  - [Option 1: Install from .deb package (Recommended)](#option-1-install-from-deb-package-recommended)
+  - [Option 2: Build Manually](#option-2-build-manually)
+- [Technical Details](#technical-details)
+- [License](#license)
+- [Author](#author)
 
 ---
 
-## 🧰 Project Structure
+## Overview
+CalcPlusPlus is a professional, modern, and intuitive scientific calculator application developed using C++17 and the Qt6 framework. Designed for Linux (Ubuntu 22.04+), it offers a clean user interface, responsive layout, and persistent calculation history, making it a reliable tool for both basic and advanced mathematical operations.
 
-```
-
-CalcPlusPlus/
-├── CMakeLists.txt
-├── include/              # Header files
-├── src/                  # Core source code
-│   ├── core/             # Business logic (CalculatorCore, ExpressionParser, etc.)
-│   ├── ui/               # GUI elements and Qt windows
-│   ├── utils/            # Utility functions and classes
-│   └── main.cpp          # Entry point
-├── assets/               # Icons, stylesheets, etc.
-├── database/             # SQLite file and schema (auto-created)
-├── .gitignore
-├── LICENSE
-└── README.md
-
-````
+- **Version:** v1.0.0
+- **Platform:** Linux (Ubuntu 22.04+)
+- **Built with:** C++17, Qt6 (Widgets, Core, GUI, SQL), CMake, SQLite
+- **Packaging:** `.deb` installer generated via CPack
 
 ---
 
-## ⚙️ Installation & Setup
+## Features
 
-### 🧩 Requirements
+### Core Functionality
+-   **Comprehensive Operations:** Perform addition, subtraction, multiplication, division, percentages, exponentiation (x^y), and square roots.
+-   **Precision Handling:** Supports decimal values and negative numbers with double-precision floating-point arithmetic.
+-   **Robustness:** Includes integrated error handling to gracefully manage invalid expressions and mathematical exceptions like division by zero.
 
-- **Ubuntu 22.04+**
-- **Qt6** (QtCore, QtWidgets, QtSql)
-- **CMake ≥ 3.22**
-- **g++ ≥ 13.0**
-- **SQLite3**
+### Expression Display
+CalcPlusPlus features an intuitive dual-line display for clarity:
+-   **Top Line:** Shows the full mathematical expression as it's being entered or processed (e.g., `75 × 3 + 2`).
+-   **Bottom Line:** Displays the current number being input or the partial/final result (e.g., `227`).
+-   **Post-Calculation View:** After pressing the equals button (`=`), the complete expression (e.g., `75 × 3 + 2 =`) remains visible in a smaller, semi-transparent style above the final result, providing a clear record of the performed calculation.
 
-### 🧪 Build Instructions
+### Interactive History
+A dedicated history panel, integrated seamlessly as a `QDockWidget`, provides a comprehensive record of all past calculations:
+-   **Persistent Storage:** All operations (expression and result) are automatically saved to a local SQLite database (`calc_history.db`), ensuring history is retained across application sessions.
+-   **Scrollable List:** Displays entries in a scrollable list, with each item showing the operation and its result.
+-   **Recall Functionality:** Clicking any history entry loads that specific expression and its result back into the main calculator display, allowing users to easily reuse or continue from previous calculations.
+-   **Clear History:** A convenient "Clear History" button is available within the panel to delete all stored entries.
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/CodeWithBotinaOficial/CalcPlusPlus.git
-   cd CalcPlusPlus
+### Error Handling
+-   **User-Friendly Alerts:** Replaces generic system message boxes with custom-styled alert dialogs that match the application's dark theme.
+-   **Clear Feedback:** Provides user-friendly error messages for invalid expressions, mathematical exceptions (e.g., `sqrt(-1)`), and operational issues.
+
+### Design & User Interface
+-   **Modern Dark Theme:** Features a sleek dark theme with consistent typography, spacing, and color palette for an aesthetically pleasing experience.
+-   **Responsive Layout:** The window layout is designed to adapt gracefully to different display sizes, maintaining usability and visual appeal.
+-   **Intuitive Button Arrangement:** Buttons are arranged in a standard, easy-to-use calculator layout for efficient input.
+
+---
+
+## Installation Guide
+
+### Option 1: Install from .deb package (Recommended)
+The easiest way to install CalcPlusPlus on Ubuntu 22.04+ is by using the provided Debian package.
+
+1.  **Download the `.deb` file:**
+    Obtain the latest `calcplusplus_1.0.0_amd64.deb` file from the [Releases page](https://github.com/CodeWithBotinaOficial/CalcPlusPlus/releases).
+
+2.  **Install the package:**
+    Open a terminal in the directory where you downloaded the `.deb` file and run:
+    ```bash
+    sudo dpkg -i calcplusplus_1.0.0_amd64.deb
+    sudo apt install -f # To resolve any missing dependencies
     ```
 
-2. **Configure the build**
+3.  **Launch CalcPlusPlus:**
+    Once installed, you can launch CalcPlusPlus from your system’s applications menu (look under "Utilities" or "Calculator") or by typing the command:
+    ```bash
+    CalcPlusPlus
+    ```
 
-   ```bash
-   cmake -B build
-   ```
+### Option 2: Build Manually
+If you prefer to build CalcPlusPlus from source, follow these steps:
 
-3. **Compile the app**
+1.  **Install Dependencies:**
+    Ensure you have the necessary build tools and Qt6 development libraries installed:
+    ```bash
+    sudo apt update
+    sudo apt install qt6-base-dev qt6-base-dev-tools libsqlite3-dev cmake g++ ninja-build
+    ```
 
-   ```bash
-   cmake --build build
-   ```
+2.  **Clone the Repository:**
+    ```bash
+    git clone https://github.com/CodeWithBotinaOficial/CalcPlusPlus.git
+    cd CalcPlusPlus
+    ```
 
-4. **Run it**
+3.  **Build the Project:**
+    ```bash
+    cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/lib/x86_64-linux-gnu/cmake/Qt6
+    cmake --build build --config Release
+    ```
 
-   ```bash
-   ./build/CalcPlusPlus
-   ```
-
----
-
-## 📦 Creating the .deb Package
-
-To create a `.deb` package for distribution:
-
-```bash
-cpack -G DEB
-```
-
-This will generate a Debian package in the `build` directory, which you can install with:
-
-```bash
-sudo dpkg -i CalcPlusPlus-*.deb
-```
-
----
-
-## 🧠 Design Overview
-
-CalcPlusPlus uses a **modular architecture** that separates logic, data, and presentation:
-
-* **Core Layer (`src/core`)**
-  Handles all mathematical computations and error validations.
-* **Database Layer (`src/db`)**
-  Manages SQLite connections, query execution, and persistent history.
-* **UI Layer (`src/ui`)**
-  Implements all Qt widgets, signals, and slots for interactive experience.
+4.  **Run the Executable:**
+    ```bash
+    ./build/CalcPlusPlus
+    ```
 
 ---
 
-## 💾 Database Schema
-
-The SQLite database stores all user operations for quick access and browsing:
-
-```sql
-CREATE TABLE history (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    expression TEXT NOT NULL,
-    result TEXT NOT NULL,
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-```
+## Technical Details
+-   **Project Structure:**
+    -   `src/core`: Contains the core mathematical logic and the SQLite database manager.
+    -   `src/ui`: Manages the Qt Widgets-based user interface and window components.
+    -   `src/utils`: Provides utility classes for error handling and custom alerts.
+    -   `resources/`: Stores application assets like icons and desktop entry files.
+-   **Build System:** CMake is used for cross-platform build configuration, with Ninja as the build tool.
+-   **Database:** SQLite3 is integrated for persistent storage of calculation history, automatically managed on application startup.
+-   **Release Automation:** GitHub Actions are configured to automate the build process, generate `.deb` packages, and publish them to GitHub Releases and GitHub Packages upon new tag pushes.
 
 ---
 
-## 👨‍💻 Author
-
-**Diego Alejandro Botina**
-Alias: **CodeWithBotina**
-🌐 [GitHub Profile](https://github.com/CodeWithBotinaOficial)
-💼 Software Developer | C++ | Qt | Systems Enthusiast
+## License
+This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 📜 License
-
-This project is licensed under the **MIT License** — see the [LICENSE](./LICENSE) file for details.
-
----
-
-## ⭐ Contribute & Support
-
-If you like this project, consider giving it a ⭐ on GitHub!
-Contributions, pull requests, and feature suggestions are always welcome.
-
----
-
-🧮 *CalcPlusPlus — a clean, fast, and modern calculator built for developers by developers.*
+## Author
+© 2025 Diego Alejandro Botina — *CodeWithBotina*
