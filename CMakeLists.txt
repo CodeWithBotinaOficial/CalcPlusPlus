@@ -73,7 +73,6 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/calcplusplus.desktop"
 
 # 3. Install the application icon
 # IMPORTANT: Ensure a valid 256x256 PNG icon named 'calcplusplus.png' exists in resources/icons/
-# The previous 'file(WRITE ... "")' placeholder has been removed as it was overwriting the actual icon.
 file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/resources/icons") # Ensure directory exists
 install(FILES "${CMAKE_SOURCE_DIR}/resources/icons/calcplusplus.png"
     DESTINATION share/icons/hicolor/256x256/apps
@@ -98,13 +97,11 @@ set(CPACK_DEBIAN_PACKAGE_CONTROL_FILE "${CMAKE_SOURCE_DIR}/debian/control")
 # Include postinst and prerm scripts
 set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/debian/postinst;${CMAKE_SOURCE_DIR}/debian/prerm")
 
-# Set the output .deb file name and directory
-set(CPACK_PACKAGE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}") # Output to build/ directory
-set(CPACK_OUTPUT_FILE_NAMES "calcplusplus_${CPACK_PACKAGE_VERSION}_${CPACK_DEBIAN_ARCHITECTURE}") # Explicitly set output filename
+# Define the base name for the package file (e.g., calcplusplus_1.0.0_amd64)
+set(CPACK_PACKAGE_FILE_NAME "calcplusplus_${CPACK_PACKAGE_VERSION}_${CPACK_DEBIAN_ARCHITECTURE}")
 
-# Unset conflicting CPack variables
-unset(CPACK_PACKAGE_FILE_NAME)
-unset(CPACK_DEBIAN_FILE_NAME)
+# Explicitly set the full path and name for the DEB package output
+set(CPACK_OUTPUT_FILE_NAMES "${CMAKE_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}.deb")
 
 # Include CPack last
 include(CPack)

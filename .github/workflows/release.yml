@@ -20,11 +20,12 @@ jobs:
         run: |
           cmake -B build -DCMAKE_BUILD_TYPE=Release
           cmake --build build --target all
-          cpack --config build/CPackConfig.cmake
+          cd build # Change directory to build
+          cpack --config CPackConfig.cmake # Run cpack from build directory
 
       - name: Upload .deb to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: build/*.deb
+          files: build/*.deb # This path is relative to the GITHUB_WORKSPACE, which is the project root
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
