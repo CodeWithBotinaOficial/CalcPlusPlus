@@ -44,21 +44,67 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE Qt6::Widgets Qt6::Core Qt6::Gui Qt6::Sql
 )
 
-# Install rules for creating a .deb package later
-install(TARGETS ${PROJECT_NAME} DESTINATION bin)
-install(FILES
-    # Add any other necessary files for deployment here, e.g., icons, config files
-    # For now, just the executable
-    DESTINATION share/${PROJECT_NAME}
+# --- Installation Configuration ---
+
+# 1. Install the compiled binary
+install(TARGETS ${PROJECT_NAME} DESTINATION /usr/local/bin)
+
+# 2. Create and install the .desktop launcher file
+set(CALCPLUSPLUS_DESKTOP_CONTENT "
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=CalcPlusPlus
+Comment=Modern calculator app built with Qt6
+Exec=CalcPlusPlus
+Icon=calcplusplus
+Terminal=false
+Categories=Utility;Calculator;
+StartupNotify=true
+")
+
+# Write the .desktop file to the build directory
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/calcplusplus.desktop" "${CALCPLUSPLUS_DESKTOP_CONTENT}")
+
+# Install the .desktop file
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/calcplusplus.desktop"
+    DESTINATION share/applications
 )
 
-# CPack configuration for .deb package
+# 3. Install the application icon
+# IMPORTANT: Ensure a valid 256x256 PNG icon named 'calcplusplus.png' exists in resources/icons/
+# The previous 'file(WRITE ... "")' placeholder has been removed as it was overwriting the actual icon.
+file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/resources/icons") # Ensure directory exists
+install(FILES "${CMAKE_SOURCE_DIR}/resources/icons/calcplusplus.png"
+    DESTINATION share/icons/hicolor/256x256/apps
+)
+
+# --- CPack Configuration for Debian Package ---
+
+include(InstallRequiredSystemLibraries)
 set(CPACK_GENERATOR "DEB")
-set(CPACK_PACKAGE_NAME "CalcPlusPlus")
+set(CPACK_PACKAGE_NAME "calcplusplus")
 set(CPACK_PACKAGE_VERSION "1.0.0")
-set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Diego Botina <code.with.botina@gmail.com>")
-set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "A modern scientific calculator built with Qt6 and C++.")
-set(CPACK_DEBIAN_PACKAGE_SECTION "math")
+set(CPACK_PACKAGE_CONTACT "Diego Alejandro Botina <code.with.botina@gmail.com>")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Diego Alejandro Botina")
+set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
 set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
-set(CPACK_DEBIAN_FILE_NAME "CalcPlusPlus-${CPACK_PACKAGE_VERSION}-Linux.deb")
+set(CPACK_DEBIAN_ARCHITECTURE "amd64")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Modern calculator built with Qt6 and C++")
+
+# Point CPack to the custom debian/control file
+set(CPACK_DEBIAN_PACKAGE_CONTROL_FILE "${CMAKE_SOURCE_DIR}/debian/control")
+
+# Include postinst and prerm scripts
+set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/debian/postinst;${CMAKE_SOURCE_DIR}/debian/prerm")
+
+# Set the output .deb file name and directory
+set(CPACK_PACKAGE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}") # Output to build/ directory
+set(CPACK_OUTPUT_FILE_NAMES "calcplusplus_${CPACK_PACKAGE_VERSION}_${CPACK_DEBIAN_ARCHITECTURE}") # Explicitly set output filename
+
+# Unset conflicting CPack variables
+unset(CPACK_PACKAGE_FILE_NAME)
+unset(CPACK_DEBIAN_FILE_NAME)
+
+# Include CPack last
 include(CPack)

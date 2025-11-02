@@ -1,0 +1,16 @@
+#!/bin/bash
+set -e
+
+# Remove desktop file (handled by dpkg, but good to be explicit if needed)
+# rm -f /usr/share/applications/calcplusplus.desktop || true
+
+# Remove icon (handled by dpkg, but good to be explicit if needed)
+# rm -f /usr/share/icons/hicolor/256x256/apps/calcplusplus.png || true
+
+# Update desktop file database
+update-desktop-database -q || true
+
+# Update icon cache for the hicolor theme after removal
+gtk-update-icon-cache -f /usr/share/icons/hicolor || true
+
+exit 0

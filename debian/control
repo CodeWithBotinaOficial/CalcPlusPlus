@@ -1,0 +1,9 @@
+Package: calcplusplus
+Version: 1.0.0
+Section: utils
+Priority: optional
+Architecture: amd64
+Maintainer: Diego Alejandro Botina <code.with.botina@gmail.com>
+Description: Modern calculator built with Qt6 and C++
+ CalcPlusPlus is a sleek, high-performance calculator that supports advanced math operations,
+ built for speed and clarity using Qt6 and CMake.

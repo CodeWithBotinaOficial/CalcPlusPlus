@@ -88,16 +88,6 @@ Thumbs.db
 *~
 
 # ------------------------------------------------------
-# Coverage and testing
-# ------------------------------------------------------
-# Ignore coverage reports and testing artifacts.
-*.gcno
-*.gcda
-*.gcov
-coverage/
-lcov-report/
-
-# ------------------------------------------------------
 # Python virtual environments (if using scripts)
 # ------------------------------------------------------
 venv/
@@ -135,6 +125,11 @@ todo.txt
 *.bak
 *.draft
 *.tmp
+
+# ------------------------------------------------------
+# CPack generated temporary directories
+# ------------------------------------------------------
+_CPack_Packages/
 
 # ======================================================
 # END OF FILE

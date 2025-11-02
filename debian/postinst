@@ -1,0 +1,30 @@
+#!/bin/bash
+set -e
+
+# Update desktop file database
+update-desktop-database -q || true
+
+# Path to the installed icon
+ICON_PATH="/usr/share/icons/hicolor/256x256/apps/calcplusplus.png"
+
+echo "--- Postinst Script Debugging ---"
+# Check if the icon file exists
+if [ -f "$ICON_PATH" ]; then
+    echo "Icon file found at: $ICON_PATH"
+    # Check permissions and size
+    ls -lh "$ICON_PATH"
+else
+    echo "WARNING: Icon file NOT found at: $ICON_PATH"
+fi
+
+# Update icon cache for the hicolor theme
+gtk-update-icon-cache -f /usr/share/icons/hicolor || true
+echo "Icon cache updated for hicolor theme."
+
+# Attempt to update all icon caches (more aggressive)
+# This might be needed for some desktop environments
+# update-icon-caches /usr/share/icons/* || true
+
+echo "--- Postinst Script Finished ---"
+
+exit 0
